@@ -39,3 +39,4 @@ cmake --build build --config Release
 - SDL exposes PlayStation controls with Xbox-style names in many cases:
   - `A / Cross`, `B / Circle`, `X / Square`, `Y / Triangle`.
 - Config file path is `config/dualsense2serial.json` relative to the working directory.
+- Release builds are configured to statically link SDL2 and the MSVC runtime for portable distribution.

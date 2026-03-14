@@ -1,0 +1,5 @@
+{
+  "baud_rate": 115200,
+  "mappings": {},
+  "serial_port": "COM7"
+}

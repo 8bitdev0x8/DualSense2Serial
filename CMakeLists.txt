@@ -5,12 +5,22 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+if(MSVC)
+  # Link the MSVC runtime statically to reduce external runtime dependencies.
+  set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+endif()
+
 # Suppress deprecation warnings from vendored third-party CMake projects.
 set(CMAKE_WARN_DEPRECATED OFF CACHE BOOL "" FORCE)
 
 include(FetchContent)
 
 set(FETCHCONTENT_QUIET OFF)
+
+# Build SDL as a static library to avoid requiring SDL2.dll at runtime.
+set(SDL_SHARED OFF CACHE BOOL "" FORCE)
+set(SDL_STATIC ON CACHE BOOL "" FORCE)
+set(SDL_TEST OFF CACHE BOOL "" FORCE)
 
 FetchContent_Declare(
   SDL2
@@ -46,7 +56,7 @@ target_include_directories(imgui_lib PUBLIC
   ${imgui_SOURCE_DIR}/backends
 )
 
-target_link_libraries(imgui_lib PUBLIC SDL2::SDL2)
+target_link_libraries(imgui_lib PUBLIC SDL2::SDL2-static)
 
 add_executable(DualSense2Serial
   src/main.cpp
@@ -59,19 +69,11 @@ add_executable(DualSense2Serial
 target_include_directories(DualSense2Serial PRIVATE include)
 
 target_link_libraries(DualSense2Serial PRIVATE
-  SDL2::SDL2
+  SDL2::SDL2-static
   imgui_lib
   nlohmann_json::nlohmann_json
 )
 
 if(WIN32)
   target_compile_definitions(DualSense2Serial PRIVATE WIN32_LEAN_AND_MEAN NOMINMAX SDL_MAIN_HANDLED)
-
-  # Ensure SDL2.dll and other runtime DLLs are placed next to the .exe for local runs.
-  add_custom_command(TARGET DualSense2Serial POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-      $<TARGET_RUNTIME_DLLS:DualSense2Serial>
-      $<TARGET_FILE_DIR:DualSense2Serial>
-    COMMAND_EXPAND_LISTS
-  )
 endif()
