@@ -1,6 +1,8 @@
-# DualSense2Serial (C++)
+# DualSense2Serial
 
 A native C++ desktop app that maps Sony DualSense button presses to serial messages.
+
+![DualSense2Serial UI](images/Duelsense2Serial.png)
 
 ## Features
 
